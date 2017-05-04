@@ -1,0 +1,39 @@
+body {
+    background: lightsteelblue;
+}
+
+button {
+    border-style: none;
+    background: none;
+}
+
+button:focus {
+    outline: none;
+}
+
+.container-fluid {
+    background: lightsteelblue;
+    margin-top: 100px;
+}
+
+.big-text {
+    font-size: 20px;
+}
+
+#circle {
+    height: 200px;
+    width: 200px;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 50%;
+    /*line-height: 100px; */
+    /*text-align: center;*/
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-direction: column
+}
+
+/*#circle > * {
+    display: block;
+}*/
