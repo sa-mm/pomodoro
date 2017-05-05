@@ -1,4 +1,13 @@
-var clock = function () {
+// var model = function () {
+
+// }
+
+// var view = function () 
+var pomodoroClock = function () {
+  // var timer = {
+  //   timeLeft: '25:00',
+  //   timerLabel: 'Session'
+  // }
   var ids = ['break-decrement', 'break-increment', 'break-length',
     'session-decrement', 'session-increment', 'session-length',
     'start_stop', 'reset', 'circle', 'time-left', 'timer-label']
@@ -49,12 +58,12 @@ var clock = function () {
   }
   setSessionCounterNum(sessionText)
 
-  var counter = document.getElementById('time-left')
+  var timeLeft = document.getElementById('time-left')
   var counterNum
   var setCounterNum = function (txt) {
     counterNum = +txt * 60 * 1000
   }
-  // setCounterNum(counter.textContent)
+  // setCounterNum(timeLeft.textContent)
 
   var setCounter = function (num) {
     var date = new Date()
@@ -67,21 +76,21 @@ var clock = function () {
     }
     m = checkTime(m)
     s = checkTime(s)
-    counter.textContent = m + ':' + s
+    timeLeft.textContent = m + ':' + s
   }
   els['session-decrement'].addEventListener('click', function (target) {
     sessionText = dec(sessionText)
     sessionLength.textContent = sessionText
-    // counter.textContent = sessionText
-    // setCounterNum(counter.textContent)
+    // timeLeft.textContent = sessionText
+    // setCounterNum(timeLeft.textContent)
     setSessionCounterNum(sessionText)
     setCounter(sessionCounterNum)
   })
   els['session-increment'].addEventListener('click', function () {
     sessionText = inc(sessionText)
     sessionLength.textContent = sessionText
-    counter.textContent = sessionText
-    // setCounterNum(counter.textContent)
+    timeLeft.textContent = sessionText
+    // setCounterNum(timeLeft.textContent)
     setSessionCounterNum(sessionText)
     setCounter(sessionCounterNum)
   })
@@ -124,7 +133,7 @@ var clock = function () {
         }
         m = checkTime(m)
         s = checkTime(s)
-        counter.textContent = m + ':' + s
+        timeLeft.textContent = m + ':' + s
         var playBeep = function () {
           var beep = document.getElementById('beep')
           // beep.play()
@@ -183,10 +192,11 @@ var clock = function () {
     breakLength.nodeValue = breakText
     document.getElementById('timer-label').textContent = 'Session'
     document.getElementById('time-left').textContent = '25:00'
-    // setCounterNum(counter.textContent)
+    // setCounterNum(timeLeft.textContent)
     setSessionCounterNum(sessionText)
+    // sessionCounterNum = sessionCounterNum + 1000
     setBreakCounterNum(breakText)
   })
 }
 
-clock()
+pomodoroClock()
