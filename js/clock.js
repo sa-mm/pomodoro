@@ -22,6 +22,12 @@ var pView = function () {
     els['time-left'].textContent = m + ':' + s
   }
 
+  var setTimeLeft = function setTimeLeft (num) {
+    var date = new Date()
+    date.setTime(num)
+    updateTime(date)
+  }
+
   var dec = function (id) {
     var txt = els[id].textContent
     var num = +txt
@@ -34,12 +40,6 @@ var pView = function () {
     var num = +txt
     num >= 60 ? num : num++
     els[id].textContent = num
-  }
-
-  var setTimeLeft = function setTimeLeft (num) {
-    var date = new Date()
-    date.setTime(num)
-    updateTime(date)
   }
 
   return {
