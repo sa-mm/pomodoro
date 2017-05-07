@@ -10,7 +10,9 @@ var pView = function () {
 
   var els = ids.reduce(idsToElements, {})
 
-  var updateTime = function updateTime(date) {
+  var setTimeLeft = function setTimeLeft(counterNum) {
+    var date = new Date()
+    date.setTime(counterNum)
     var checkTime = function checkTime(i) {
       if (i < 10) { i = '0' + i };  // add zero in front of numbers < 10
       return i
@@ -22,10 +24,11 @@ var pView = function () {
     els['time-left'].textContent = m + ':' + s
   }
 
-  var setTimeLeft = function setTimeLeft (num) {
-    var date = new Date()
-    date.setTime(num)
-    updateTime(date)
+  var resetView = function resetView () {
+    els['session-length'].textContent = 25
+    els['break-length'].textContent = 5
+    els['timer-label'].textContent = 'Session'
+    els['time-left'].textContent = '25:00'
   }
 
   var dec = function (id) {
@@ -46,8 +49,8 @@ var pView = function () {
     els: els,
     dec: dec,
     inc: inc,
-    updateTime: updateTime,
-    setTimeLeft: setTimeLeft
+    setTimeLeft: setTimeLeft,
+    resetView: resetView
   }
 }
 
@@ -57,11 +60,11 @@ var timer = {
   isSession: true,
   isStopped: true,
   alreadyStarted: false,
-  breakCounterNum: 5 * 60 * 1000 + 1000,
+  breakCounterNum: 5 * 60 * 1000,
   sessionCounterNum: 25 * 60 * 1000,
 
   // save initial values
-  init: function() {
+  init: function () {
     var origValues = {}
     for (var prop in this) {
       if (this.hasOwnProperty(prop) && prop !== 'origValues') {
@@ -72,18 +75,26 @@ var timer = {
   },
 
   // restore initial origValues
-  resetTimer: function() {
+  resetTimer: function () {
     for (var prop in this.origValues) {
       this[prop] = this.origValues[prop]
     }
   },
 
-  setBreakCounterNum: function (txt) {
-    this.breakCounterNum = +txt * 60 * 1000 + 1000
-  },
+  setCounterNum: function (type, direction) {
+    var view = pView()
+    var id = type + '-length'
+    if (direction === 'inc') {
+      view.inc(id)
+    } else if (direction === 'dec') {
+      view.dec(id)
+    }
+    var txt = view.els[id].textContent
+    this[type + 'CounterNum'] = +txt * 60 * 1000 + 1000
 
-  setSessionCounterNum: function (txt) {
-    this.sessionCounterNum = +txt * 60 * 1000
+    if (type === 'session' && direction) {
+      view.setTimeLeft(this.sessionCounterNum - 1)
+    }
   }
 }
 
@@ -94,54 +105,45 @@ var pomodoroClock = function () {
   var els = view.els
 
   els['break-decrement'].addEventListener('click', function () {
-    view.dec('break-length')
-    timer.setBreakCounterNum(els['break-length'].textContent)
+    timer.setCounterNum('break', 'dec')
   })
 
   els['break-increment'].addEventListener('click', function () {
-    view.inc('break-length')
-    timer.setBreakCounterNum(els['break-length'].textContent)
+    timer.setCounterNum('break', 'inc')
   })
 
   els['session-decrement'].addEventListener('click', function () {
-    view.dec('session-length')
-    timer.setSessionCounterNum(els['session-length'].textContent)
-    view.setTimeLeft(timer.sessionCounterNum)
+    timer.setCounterNum('session', 'dec')
   })
 
   els['session-increment'].addEventListener('click', function () {
-    view.inc('session-length')
-    timer.setSessionCounterNum(els['session-length'].textContent)
-    view.setTimeLeft(timer.sessionCounterNum)
+    timer.setCounterNum('session', 'inc')
   })
 
   var counterCb = function (e) {
-    e.preventDefault()
     timer.isStopped = !timer.isStopped
     var countDown = function () {
       if (!timer.isStopped) {
         // if the timer isn't stopped, then
         // decrement a counter and
         // update the session or break view
-        var date = new Date()
         if (timer.isSession) {
           timer.sessionCounterNum = timer.sessionCounterNum - 1000
-          date.setTime(timer.sessionCounterNum)
+          view.setTimeLeft(timer.sessionCounterNum)
           els['timer-label'].textContent = 'Session'
         } else {
           timer.breakCounterNum = timer.breakCounterNum - 1000
-          date.setTime(timer.breakCounterNum)
+          view.setTimeLeft(timer.breakCounterNum)
           els['timer-label'].textContent = 'Break!'
         }
-        view.updateTime(date)
         var playBeep = function () {
           var beep = document.getElementById('beep')
           // beep.play()
         }
 
         var flipSession = function flipSession() {
-          timer.isSession = !timer.isSession
           clearInterval(interval)
+          timer.isSession = !timer.isSession
           playBeep()
           interval = setInterval(countDown, 1000)
         }
@@ -149,14 +151,13 @@ var pomodoroClock = function () {
         // has reached 0, then flip to the other session
         if (timer.isSession && timer.sessionCounterNum <= 0) {
           flipSession()
-          timer.setBreakCounterNum(els['break-length'].textContent)
+          timer.setCounterNum('break')
         } else if (!timer.isSession && timer.breakCounterNum <= 0) {
           flipSession()
-          timer.setSessionCounterNum(els['session-length'].textContent)
-          timer.sessionCounterNum = timer.sessionCounterNum + 1000
+          timer.setCounterNum('session')
         }
         console.log('sessionCounterNum: ' + timer.sessionCounterNum)
-        console.log('breakCounterNum: ' + timer.breakCounterNum)
+        console.log('breakCounterNum: ' + timer.breakCounterNum + ' and time-left element: ' + view.els['time-left'].textContent)
       }
       els.reset.addEventListener('click', function (e) {
         // when reset clicked
@@ -165,8 +166,8 @@ var pomodoroClock = function () {
       })
     }
     if (!timer.alreadyStarted) {
-      var interval = setInterval(countDown, 1000)
       timer.alreadyStarted = !timer.alreadyStarted
+      var interval = setInterval(countDown, 1000)
     }
   }
 
@@ -175,12 +176,7 @@ var pomodoroClock = function () {
 
   els.reset.addEventListener('click', function (e) {
     timer.resetTimer()
-    els['session-length'].textContent = 25
-    els['break-length'].textContent = 5
-    els['timer-label'].textContent = 'Session'
-    els['time-left'].textContent = '25:00'
-    timer.setSessionCounterNum('25')
-    timer.setBreakCounterNum('5')
+    view.resetView()
   })
 }
 
