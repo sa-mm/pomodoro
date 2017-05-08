@@ -92,6 +92,7 @@ var timer = {
     var txt = view.els[id].textContent
     this[type + 'CounterNum'] = +txt * 60 * 1000 + 1000
 
+    // update time-left
     if (type === 'session' && direction) {
       view.setTimeLeft(this.sessionCounterNum - 1)
     }
@@ -136,14 +137,16 @@ var pomodoroClock = function () {
           view.setTimeLeft(timer.breakCounterNum)
           els['timer-label'].textContent = 'Break!'
         }
+
         var playBeep = function () {
           var beep = document.getElementById('beep')
-          // beep.play()
+          beep.play()
         }
 
         var flipSession = function flipSession() {
           clearInterval(interval)
           timer.isSession = !timer.isSession
+          // play audio at end of session/break
           playBeep()
           interval = setInterval(countDown, 1000)
         }
@@ -171,8 +174,7 @@ var pomodoroClock = function () {
     }
   }
 
-  var startStop = els.start_stop
-  startStop.addEventListener('click', counterCb)
+  els.start_stop.addEventListener('click', counterCb)
 
   els.reset.addEventListener('click', function (e) {
     timer.resetTimer()
