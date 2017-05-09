@@ -29,6 +29,7 @@ var pView = function () {
     els['break-length'].textContent = 5
     els['timer-label'].textContent = 'Session'
     els['time-left'].textContent = '25:00'
+    els['start_stop'].firstElementChild.className = 'glyphicon glyphicon-play'
   }
 
   var dec = function (id) {
@@ -123,6 +124,17 @@ var pomodoroClock = function () {
 
   var counterCb = function (e) {
     timer.isStopped = !timer.isStopped
+    if (timer.isStopped) {
+      // var el = 'Play <span class="glyphicon glyphicon-play" aria-hidden="true"></span>'
+      // els['start_stop'].innerHTML = el
+      els['start_stop'].firstElementChild.className = 'glyphicon glyphicon-play'
+      // els['start_stop'].textContent = 'Start'
+    } else {
+      // var el = 'Pause <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>'
+      // els['start_stop'].innerHTML = el
+      els['start_stop'].firstElementChild.className = 'glyphicon glyphicon-pause'
+      // els['start_stop'].textContent = 'Pause'
+    }
     var countDown = function () {
       if (!timer.isStopped) {
         // if the timer isn't stopped, then
